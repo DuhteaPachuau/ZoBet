@@ -6,6 +6,7 @@ dj-database-url==3.0.1
 psycopg2-binary==2.9.11
 django-allauth==65.17.0
 PyJWT==2.13.0
+cryptography==48.0.0
 django-cloudinary-storage==0.3.0
 cloudinary==1.44.1
 razorpay==2.0.1
