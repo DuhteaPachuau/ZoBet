@@ -165,15 +165,20 @@ def declare_winner_view(request, event_id):
     return redirect('events:detail', event_id=event.id)
 
 @staff_member_required
+@staff_member_required
 def create_event_view(request):
     if request.method == 'POST':
         form = EventForm(request.POST, request.FILES)
         if form.is_valid():
-            event = form.save(commit=False)
-            event.created_by = request.user
-            event.save()
-            messages.success(request, 'Event created successfully! Add teams now.')
-            return redirect('events:add_teams', event_id=event.id)
+            try:
+                event = form.save(commit=False)
+                event.created_by = request.user
+                event.save()
+                messages.success(request, 'Event created successfully! Add teams now.')
+                return redirect('events:add_teams', event_id=event.id)
+            except Exception as e:
+                messages.error(request, f'Error creating event: {e}')
+                return redirect('events:create_event')
     else:
         form = EventForm()
     return render(request, 'events/create_event.html', {'form': form, 'editing': False})
