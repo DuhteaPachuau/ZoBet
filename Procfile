@@ -1,1 +1,1 @@
-web: gunicorn zobet.wsgi:application
+web: gunicorn app:app
