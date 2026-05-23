@@ -14,7 +14,7 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             messages.success(request, 'Registration successful! Welcome to ZoBet!')
-            login(request, user)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect('home')
     else:
         form = RegisterForm()
@@ -27,7 +27,7 @@ def login_view(request):
         form = LoginForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            login(request, user)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             messages.success(request, f'Welcome back, {user.username}!')
             return redirect('home')
     else:
