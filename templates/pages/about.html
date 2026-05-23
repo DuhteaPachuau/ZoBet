@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}About - ZoBet{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-24">
+    <div class="text-center mb-10 sm:mb-12">
+        <div class="flex items-center justify-center gap-2 text-3xl sm:text-5xl font-black mb-4">
+            <span class="text-red-500">&#9733;</span>
+            <span class="text-white">Zo<span class="text-red-500">Bet</span></span>
+        </div>
+        <p class="text-gray-400 text-sm sm:text-base max-w-xl mx-auto">Mizoram's own tournament prediction platform where sports fans turn their knowledge into rewards.</p>
+    </div>
+
+    <div class="glass rounded-2xl p-6 sm:p-8 border border-gray-700/50 mb-6">
+        <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">Our Mission</h2>
+        <p class="text-gray-400 text-sm sm:text-base leading-relaxed">ZoBet was built to bring fans closer to the action. We believe that predicting tournament outcomes should be exciting, rewarding, and transparent. Our platform lets you put your sports knowledge to the test and win real prizes when your predictions come true.</p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 gap-4 sm:gap-6 mb-6">
+        <div class="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 border border-gray-700/50">
+            <div class="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center text-red-400 text-xl mb-4">🎯</div>
+            <h3 class="text-white font-bold mb-2 text-sm sm:text-base">Fair Play</h3>
+            <p class="text-gray-400 text-xs sm:text-sm">Every event has a clear commission fee displayed upfront. Prize pools are distributed automatically with full transparency.</p>
+        </div>
+        <div class="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 border border-gray-700/50">
+            <div class="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center text-red-400 text-xl mb-4">🔒</div>
+            <h3 class="text-white font-bold mb-2 text-sm sm:text-base">Secure & Trusted</h3>
+            <p class="text-gray-400 text-xs sm:text-sm">Your funds are held securely. Withdrawals are processed promptly with verified payment integration.</p>
+        </div>
+        <div class="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 border border-gray-700/50">
+            <div class="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center text-red-400 text-xl mb-4">⚡</div>
+            <h3 class="text-white font-bold mb-2 text-sm sm:text-base">Real-Time</h3>
+            <p class="text-gray-400 text-xs sm:text-sm">Live updates on events, instant notifications for results, and real-time wallet balance updates.</p>
+        </div>
+        <div class="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 border border-gray-700/50">
+            <div class="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center text-red-400 text-xl mb-4">🌍</div>
+            <h3 class="text-white font-bold mb-2 text-sm sm:text-base">Community</h3>
+            <p class="text-gray-400 text-xs sm:text-sm">Join thousands of predictors. Compete on the leaderboard and earn your spot among the top champions.</p>
+        </div>
+    </div>
+
+    <div class="glass rounded-2xl p-6 sm:p-8 border border-gray-700/50 text-center">
+        <h2 class="text-xl sm:text-2xl font-bold text-white mb-3">Ready to Start?</h2>
+        <p class="text-gray-400 text-sm sm:text-base mb-6">Join ZoBet today and start predicting winners.</p>
+        <div class="flex flex-wrap justify-center gap-3 sm:gap-4">
+            <a href="{% url 'accounts:register' %}" class="btn-primary">Create Free Account</a>
+            <a href="{% url 'events:list' %}" class="btn-secondary">Browse Events</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% block title %}Withdrawals - ZoBet{% endblock %}
+{% block admin_content %}
+<div class="flex items-center justify-between mb-8">
+    <div>
+        <h1 class="text-3xl font-bold text-white"><i class="fas fa-credit-card text-red-400 mr-2"></i>Withdrawal Requests</h1>
+        <p class="text-gray-500 text-sm mt-1">{{ withdrawals|length }} total requests</p>
+    </div>
+</div>
+
+<div class="glass rounded-2xl border border-gray-700/50 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-gray-700/50 text-left">
+                    <th class="px-5 py-4 text-gray-400 text-sm font-medium">User</th>
+                    <th class="px-5 py-4 text-gray-400 text-sm font-medium">Amount</th>
+                    <th class="px-5 py-4 text-gray-400 text-sm font-medium hidden sm:table-cell">UPI ID</th>
+                    <th class="px-5 py-4 text-gray-400 text-sm font-medium">Status</th>
+                    <th class="px-5 py-4 text-gray-400 text-sm font-medium hidden md:table-cell">Date</th>
+                    <th class="px-5 py-4 text-gray-400 text-sm font-medium">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800/30">
+                {% for wr in withdrawals %}
+                <tr class="hover:bg-white/5 transition {% if wr.status == 'pending' %}bg-yellow-500/5{% endif %}">
+                    <td class="px-5 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 overflow-hidden {% if wr.user.profile.profile_image %}{% else %}bg-red-500/20 text-red-400{% endif %}">
+                                {% if wr.user.profile.profile_image %}
+                                <img src="{{ wr.user.profile.profile_image.url }}" class="w-full h-full object-cover">
+                                {% else %}
+                                {{ wr.user.username|first|upper }}
+                                {% endif %}
+                            </div>
+                            <div>
+                                <div class="text-white text-sm font-medium">{{ wr.user.username }}</div>
+                                <div class="text-gray-600 text-xs">{{ wr.account_holder|truncatechars:15 }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-5 py-4 text-yellow-400 font-bold">₹{{ wr.amount|floatformat:2 }}</td>
+                    <td class="px-5 py-4 text-gray-400 text-sm hidden sm:table-cell">{{ wr.upi_id }}</td>
+                    <td class="px-5 py-4">
+                        <span class="badge {% if wr.status == 'pending' %}badge-warning{% elif wr.status == 'completed' or wr.status == 'approved' %}badge-success{% else %}badge-danger{% endif %}">
+                            {{ wr.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="px-5 py-4 text-gray-500 text-sm hidden md:table-cell">{{ wr.created_at|date:"d M Y" }}</td>
+                    <td class="px-5 py-4">
+                        {% if wr.status == 'pending' %}
+                        <div class="flex gap-2">
+                            <a href="{% url 'approve_withdrawal' wr.id %}" class="px-3 py-1.5 rounded-lg bg-green-500/20 text-green-400 text-xs hover:bg-green-500/30 transition" onclick="return confirm('Approve withdrawal of ₹{{ wr.amount }} for {{ wr.user.username }}?')">
+                                <i class="fas fa-check mr-1"></i>Approve
+                            </a>
+                            <a href="{% url 'reject_withdrawal' wr.id %}" class="px-3 py-1.5 rounded-lg bg-red-500/20 text-red-400 text-xs hover:bg-red-500/30 transition" onclick="return confirm('Reject this withdrawal?')">
+                                <i class="fas fa-times mr-1"></i>Reject
+                            </a>
+                        </div>
+                        {% else %}
+                        <span class="text-gray-600 text-xs">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center py-16 text-gray-500">No withdrawal requests</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

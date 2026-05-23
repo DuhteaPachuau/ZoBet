@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ZoBet - Mizoram's Premier Prediction Platform{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+<section class="py-8 sports-pattern">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-white">Welcome back, {{ user.username }}</h1>
+                <p class="text-gray-500 text-sm">Ready to make your predictions?</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right">
+                    <div class="text-xs text-gray-500">Balance</div>
+                    <div class="text-lg font-bold text-green-400">₹{{ user.wallet.available_balance|floatformat:0 }}</div>
+                </div>
+                <a href="{% url 'wallet:deposit' %}" class="btn-primary text-xs py-2 px-4"><i class="fas fa-plus mr-1"></i>Deposit</a>
+            </div>
+        </div>
+
+        {% if live_events or upcoming_events %}
+        {% if live_events %}
+        <section class="mb-10">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2"><span class="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></span>Live Now</h2>
+                <a href="{% url 'events:list' %}" class="text-red-400 hover:text-red-300 text-sm">View All <i class="fas fa-arrow-right ml-1"></i></a>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for event in live_events %}
+                <a href="{% url 'events:detail' event.id %}" class="stat-card group">
+                    {% if event.banner %}<img src="{{ event.banner.url }}" class="w-full h-32 object-cover rounded-lg mb-3" alt="">{% endif %}
+                    <div class="flex items-start justify-between mb-2">
+                        <h3 class="text-white font-semibold group-hover:text-red-400 transition truncate">{{ event.title }}</h3>
+                        <span class="badge badge-success flex-shrink-0 text-xs"><i class="fas fa-circle text-[8px]"></i> LIVE</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                        <div><div class="text-green-400 font-bold">₹{{ event.prize_pool|floatformat:0 }}</div><div class="text-gray-600">Prize</div></div>
+                        <div><div class="text-white font-bold">₹{{ event.entry_fee|floatformat:0 }}</div><div class="text-gray-600">Min Bet</div></div>
+                        <div><div class="text-yellow-400 font-bold">{{ event.participant_count }}</div><div class="text-gray-600">Players</div></div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <section class="mb-10">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="text-xl font-bold text-white"><i class="far fa-calendar-alt text-yellow-400 mr-2"></i>Upcoming Events</h2>
+                <a href="{% url 'events:list' %}" class="text-red-400 hover:text-red-300 text-sm">View All <i class="fas fa-arrow-right ml-1"></i></a>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for event in upcoming_events %}
+                <a href="{% url 'events:detail' event.id %}" class="stat-card group">
+                    <div class="flex items-start justify-between mb-2">
+                        <h3 class="text-white font-semibold group-hover:text-red-400 transition truncate">{{ event.title }}</h3>
+                        <span class="badge badge-warning text-xs">{{ event.start_date|date:"d M" }}</span>
+                    </div>
+                    <p class="text-gray-500 text-xs mb-3">{{ event.description|truncatechars:80 }}</p>
+                    <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                        <div><div class="text-green-400 font-bold">₹{{ event.prize_pool|floatformat:0 }}</div><div class="text-gray-600">Prize</div></div>
+                        <div><div class="text-white font-bold">₹{{ event.entry_fee|floatformat:0 }}</div><div class="text-gray-600">Min Bet</div></div>
+                        <div><div class="text-blue-400 font-bold">{{ event.start_date|date:"d M" }}</div><div class="text-gray-600">Starts</div></div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+        {% else %}
+        <div class="flex flex-col items-center justify-center py-20 text-center">
+            <div class="text-7xl mb-6">🏆</div>
+            <h2 class="text-3xl font-bold text-white mb-3">Welcome to ZoBet!</h2>
+            <p class="text-gray-400 max-w-md mb-8">No events available yet. Events will appear here once the admin creates them. Start predicting and win real prizes!</p>
+            <div class="flex flex-wrap justify-center gap-3">
+                <a href="{% url 'wallet:deposit' %}" class="btn-primary"><i class="fas fa-wallet mr-2"></i>Add Funds</a>
+                <a href="{% url 'dashboard:index' %}" class="btn-secondary"><i class="fas fa-chart-line mr-2"></i>My Dashboard</a>
+            </div>
+            <div class="mt-10 grid grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="text-3xl mb-2">🎯</div>
+                    <div class="text-white font-semibold text-sm">Predict</div>
+                    <div class="text-gray-600 text-xs">Pick your winner</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl mb-2">🏅</div>
+                    <div class="text-white font-semibold text-sm">Win</div>
+                    <div class="text-gray-600 text-xs">Earn rewards</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl mb-2">📈</div>
+                    <div class="text-white font-semibold text-sm">Compete</div>
+                    <div class="text-gray-600 text-xs">Top the leaderboard</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% else %}
+<section class="relative min-h-[80vh] sm:min-h-[90vh] flex items-center sports-pattern overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-red-900/20 via-transparent to-black/50"></div>
+    <div class="absolute top-20 left-10 w-48 sm:w-72 h-48 sm:h-72 bg-red-500/10 rounded-full blur-3xl animate-float"></div>
+    <div class="absolute bottom-20 right-10 w-64 sm:w-96 h-64 sm:h-96 bg-red-600/10 rounded-full blur-3xl animate-float" style="animation-delay: 1.5s;"></div>
+    <div class="relative max-w-7xl mx-auto px-4 py-16 sm:py-24">
+        <div class="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+            <div class="animate-slide-up text-center lg:text-left">
+                <div class="badge badge-danger mb-3 sm:mb-4 inline-flex"><i class="fas fa-fire"></i> Live Now - {{ live_events|length }} Events</div>
+                <h1 class="text-4xl sm:text-5xl md:text-7xl font-black text-white leading-tight mb-4 sm:mb-6">
+                    Predict.<br>
+                    <span class="neon-text">Win.</span>
+                    <span class="text-white">Repeat.</span>
+                </h1>
+                <p class="text-base sm:text-lg text-gray-400 mb-6 sm:mb-8 max-w-lg mx-auto lg:mx-0">Join local Mizoram tournaments, predict the champion, and win real prize money.</p>
+                <div class="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4">
+                    <a href="{% url 'events:list' %}" class="btn-primary text-sm sm:text-lg"><i class="fas fa-trophy mr-2"></i>Explore Events</a>
+                    <a href="{% url 'accounts:register' %}" class="btn-secondary text-sm sm:text-lg">Get Started Free</a>
+                </div>
+                <div class="flex items-center justify-center lg:justify-start gap-4 sm:gap-8 mt-8 sm:mt-10">
+                    <div class="text-center"><div class="text-2xl sm:text-3xl font-bold text-white">{{ total_events }}</div><div class="text-[10px] sm:text-xs text-gray-500">Events</div></div>
+                    <div class="text-center"><div class="text-2xl sm:text-3xl font-bold text-green-400">₹{{ total_prize_pool|floatformat:0 }}</div><div class="text-[10px] sm:text-xs text-gray-500">Prize Pool</div></div>
+                    <div class="text-center"><div class="text-2xl sm:text-3xl font-bold text-yellow-400">{{ total_participants }}</div><div class="text-[10px] sm:text-xs text-gray-500">Players</div></div>
+                </div>
+            </div>
+            <div class="hidden lg:flex justify-center">
+                <div class="relative w-64 sm:w-80 h-64 sm:h-80">
+                    <div class="absolute inset-0 bg-gradient-to-br from-red-500/20 to-red-600/20 rounded-full blur-3xl animate-pulse"></div>
+                    <div class="relative w-full h-full flex items-center justify-center">
+                        <div class="text-center">
+                            <div class="text-6xl sm:text-8xl mb-4">🏆</div>
+                            <div class="glass rounded-2xl px-4 sm:px-6 py-4 neon-border animate-pulse-glow">
+                                <div class="text-xl sm:text-2xl font-bold text-red-400">&#9733; ZoBet</div>
+                                <div class="text-xs sm:text-sm text-gray-400">Where Champions Are Made</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% if live_events %}
+<section class="py-10 sm:py-16">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex items-center justify-between mb-6 sm:mb-8">
+            <div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-white"><i class="fas fa-bolt text-green-400 mr-2"></i>Live Events</h2>
+                <p class="text-gray-500 text-xs sm:text-sm mt-1">Predictions open - join now!</p>
+            </div>
+            <a href="{% url 'events:list' %}" class="text-red-400 hover:text-red-300 text-xs sm:text-sm font-medium">View All <i class="fas fa-arrow-right ml-1"></i></a>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {% for event in live_events %}
+            <a href="{% url 'events:detail' event.id %}" class="stat-card group">
+                {% if event.banner %}<img src="{{ event.banner.url }}" class="w-full h-28 sm:h-32 object-cover rounded-lg mb-3 sm:mb-4" alt="{{ event.title }}">{% endif %}
+                <div class="flex items-start justify-between mb-2 sm:mb-3 gap-2">
+                    <h3 class="text-sm sm:text-base text-white font-semibold group-hover:text-red-400 transition truncate">{{ event.title }}</h3>
+                    <span class="badge badge-success flex-shrink-0 text-[10px] sm:text-xs"><i class="fas fa-circle text-[8px]"></i> LIVE</span>
+                </div>
+                <div class="space-y-1.5 text-xs sm:text-sm text-gray-500">
+                    <div class="flex justify-between"><span>Prize Pool</span><span class="text-green-400 font-semibold">₹{{ event.prize_pool|floatformat:0 }}</span></div>
+                    <div class="flex justify-between"><span>Entry Fee</span><span class="text-white">₹{{ event.entry_fee|floatformat:0 }}</span></div>
+                    <div class="flex justify-between"><span>Participants</span><span class="text-yellow-400">{{ event.participant_count }}</span></div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<section class="py-10 sm:py-16 relative">
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-red-900/5 to-transparent"></div>
+    <div class="max-w-7xl mx-auto px-4 relative">
+        <h2 class="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8"><i class="fas fa-calendar-alt text-red-400 mr-2"></i>Upcoming Events</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {% for event in upcoming_events %}
+            <a href="{% url 'events:detail' event.id %}" class="stat-card group">
+                <div class="flex items-start justify-between mb-2 sm:mb-3 gap-2">
+                    <h3 class="text-sm sm:text-base text-white font-semibold group-hover:text-red-400 transition truncate">{{ event.title }}</h3>
+                    <span class="badge badge-warning flex-shrink-0 text-[10px] sm:text-xs"><i class="far fa-clock"></i> Soon</span>
+                </div>
+                <div class="space-y-1.5 text-xs sm:text-sm text-gray-500">
+                    <div class="flex justify-between"><span>Prize Pool</span><span class="text-green-400 font-semibold">₹{{ event.prize_pool|floatformat:0 }}</span></div>
+                    <div class="flex justify-between"><span>Entry</span><span class="text-white">₹{{ event.entry_fee|floatformat:0 }}</span></div>
+                    <div class="flex justify-between"><span>Starts</span><span class="text-blue-400">{{ event.start_date|date:"d M" }}</span></div>
+                </div>
+            </a>
+            {% empty %}
+            <div class="col-span-full text-center py-8 sm:py-12 text-gray-500">
+                <i class="fas fa-calendar-times text-3xl sm:text-4xl mb-3 sm:mb-4 text-gray-600"></i>
+                <p class="text-sm sm:text-base">No upcoming events yet. Check back soon!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="py-10 sm:py-16">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="glass rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 neon-border relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-48 sm:w-64 h-48 sm:h-64 bg-red-500/10 rounded-full blur-3xl"></div>
+            <div class="relative grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
+                <div class="text-center">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-2xl bg-red-500/20 flex items-center justify-center text-xl sm:text-2xl">🎯</div>
+                    <h3 class="text-white font-bold mb-1 sm:mb-2 text-sm sm:text-base">Pick Your Champion</h3>
+                    <p class="text-gray-500 text-xs sm:text-sm">Choose the team you believe will win.</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-2xl bg-red-500/20 flex items-center justify-center text-xl sm:text-2xl">💰</div>
+                    <h3 class="text-white font-bold mb-1 sm:mb-2 text-sm sm:text-base">Pay Entry Fee</h3>
+                    <p class="text-gray-500 text-xs sm:text-sm">Use your wallet to join any event.</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-2xl bg-red-500/20 flex items-center justify-center text-xl sm:text-2xl">🏆</div>
+                    <h3 class="text-white font-bold mb-1 sm:mb-2 text-sm sm:text-base">Win Big</h3>
+                    <p class="text-gray-500 text-xs sm:text-sm">Correct predictions split the prize pool!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-10 sm:py-16">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex items-center justify-between mb-6 sm:mb-8">
+            <h2 class="text-2xl sm:text-3xl font-bold text-white"><i class="fas fa-crown text-yellow-400 mr-2"></i>Top Predictors</h2>
+            <a href="{% url 'leaderboard:index' %}" class="text-red-400 hover:text-red-300 text-xs sm:text-sm font-medium">Full Leaderboard <i class="fas fa-arrow-right ml-1"></i></a>
+        </div>
+        <div class="glass rounded-xl sm:rounded-2xl overflow-hidden">
+            <div class="divide-y divide-gray-800/50">
+                {% for user_profile in top_users %}
+                <div class="flex items-center justify-between p-3 sm:p-4 hover:bg-white/5 transition">
+                    <div class="flex items-center gap-2 sm:gap-4 min-w-0">
+                        <div class="text-lg sm:text-2xl font-black flex-shrink-0 {% if forloop.counter == 1 %}text-yellow-400{% elif forloop.counter == 2 %}text-gray-400{% elif forloop.counter == 3 %}text-amber-600{% else %}text-gray-600{% endif %}">
+                            #{{ forloop.counter }}
+                        </div>
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold flex-shrink-0 overflow-hidden {% if user_profile.user.profile.profile_image %}{% else %}bg-red-500/20 text-red-400{% endif %}">
+                            {% if user_profile.user.profile.profile_image %}
+                            <img src="{{ user_profile.user.profile.profile_image.url }}" class="w-full h-full object-cover">
+                            {% else %}
+                            {{ user_profile.user.username|first|upper }}
+                            {% endif %}
+                        </div>
+                        <div class="min-w-0">
+                            <div class="text-sm sm:text-base text-white font-semibold truncate">{{ user_profile.user.username }}</div>
+                            <div class="text-[10px] sm:text-xs text-gray-500 truncate">{{ user_profile.correct_predictions }}/{{ user_profile.total_predictions }} correct</div>
+                        </div>
+                    </div>
+                    <div class="text-right flex-shrink-0 ml-2">
+                        <div class="text-xs sm:text-base text-green-400 font-bold">₹{{ user_profile.total_winnings|floatformat:0 }}</div>
+                        <div class="text-[10px] sm:text-xs text-gray-500">earned</div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-6 sm:py-8 text-gray-500 text-sm">No predictions yet. Be the first!</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Withdraw - ZoBet{% endblock %}
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-20 px-4">
+    <div class="w-full max-w-md">
+        <div class="text-center mb-8">
+            <div class="text-4xl mb-4">💸</div>
+            <h1 class="text-3xl font-bold text-white">Withdraw Funds</h1>
+            <p class="text-gray-500 mt-2">Withdraw to your UPI account</p>
+        </div>
+        <div class="glass rounded-2xl p-8 border border-gray-700/50">
+            <div class="mb-6 p-4 rounded-xl bg-green-500/10 border border-green-500/30">
+                <p class="text-sm text-gray-400">Available Balance</p>
+                <p class="text-2xl font-bold text-green-400">₹{{ user.wallet.available_balance|floatformat:2 }}</p>
+            </div>
+            <form method="POST" class="space-y-4">
+                {% csrf_token %}
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Amount (₹)</label>
+                    <input type="number" name="amount" min="100" step="1" placeholder="Min ₹100" max="{{ user.wallet.available_balance }}" required class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">UPI ID</label>
+                    <input type="text" name="upi_id" placeholder="username@upi" required class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Account Holder Name</label>
+                    <input type="text" name="account_holder" placeholder="Full name" required class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition">
+                </div>
+                <button type="submit" class="btn-primary w-full text-center"><i class="fas fa-paper-plane mr-2"></i>Request Withdrawal</button>
+            </form>
+            <p class="text-xs text-gray-600 mt-4 text-center">Withdrawals are processed within 24-48 hours</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

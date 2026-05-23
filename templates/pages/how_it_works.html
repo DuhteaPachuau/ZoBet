@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}How It Works - ZoBet{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-24">
+    <h1 class="text-3xl sm:text-4xl font-bold text-white mb-2 text-center"><i class="fas fa-lightbulb text-red-400 mr-3"></i>How It Works</h1>
+    <p class="text-gray-500 text-sm mb-12 text-center">Three simple steps to start predicting and winning</p>
+
+    <div class="space-y-8 sm:space-y-12">
+        <div class="flex flex-col sm:flex-row items-center gap-6 sm:gap-10">
+            <div class="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl bg-red-500/20 flex items-center justify-center text-3xl sm:text-5xl flex-shrink-0">1️⃣</div>
+            <div class="text-center sm:text-left">
+                <h2 class="text-xl sm:text-2xl font-bold text-white mb-2">Create Your Account</h2>
+                <p class="text-gray-400 text-sm sm:text-base">Sign up for free and get a welcome bonus. Complete your profile and verify your email to start participating in prediction events.</p>
+            </div>
+        </div>
+        <div class="flex flex-col sm:flex-row-reverse items-center gap-6 sm:gap-10">
+            <div class="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl bg-red-500/20 flex items-center justify-center text-3xl sm:text-5xl flex-shrink-0">2️⃣</div>
+            <div class="text-center sm:text-right">
+                <h2 class="text-xl sm:text-2xl font-bold text-white mb-2">Deposit & Predict</h2>
+                <p class="text-gray-400 text-sm sm:text-base">Add funds to your wallet and join any prediction event. Study the teams, pick your champion before the deadline, and pay the entry fee.</p>
+            </div>
+        </div>
+        <div class="flex flex-col sm:flex-row items-center gap-6 sm:gap-10">
+            <div class="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl bg-red-500/20 flex items-center justify-center text-3xl sm:text-5xl flex-shrink-0">3️⃣</div>
+            <div class="text-center sm:text-left">
+                <h2 class="text-xl sm:text-2xl font-bold text-white mb-2">Win & Withdraw</h2>
+                <p class="text-gray-400 text-sm sm:text-base">When the event ends and the winner is declared, correct predictions split the prize pool. Withdraw your winnings directly to your UPI account.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass rounded-2xl p-6 sm:p-8 border border-gray-700/50 mt-10 sm:mt-12">
+        <h2 class="text-xl font-bold text-white mb-4">Prize Distribution</h2>
+        <div class="space-y-3 text-sm sm:text-base text-gray-400">
+            <div class="flex items-start gap-3">
+                <span class="text-green-400 mt-1">✓</span>
+                <p>Platform commission (configurable, displayed on each event) is deducted from the total pool.</p>
+            </div>
+            <div class="flex items-start gap-3">
+                <span class="text-green-400 mt-1">✓</span>
+                <p>Remaining prize pool is split equally among all users who predicted the winning champion.</p>
+            </div>
+            <div class="flex items-start gap-3">
+                <span class="text-green-400 mt-1">✓</span>
+                <p>Rewards are automatically credited to your wallet when the admin declares the winner.</p>
+            </div>
+            <div class="flex items-start gap-3">
+                <span class="text-green-400 mt-1">✓</span>
+                <p>Withdraw your balance anytime via UPI (minimum ₹100).</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

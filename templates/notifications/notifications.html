@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Notifications - ZoBet{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-24">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-white"><i class="fas fa-bell text-red-400 mr-2"></i>Notifications</h1>
+            <p class="text-gray-500 text-sm mt-1">{{ unread_count }} unread</p>
+        </div>
+        {% if unread_count > 0 %}
+        <a href="{% url 'notifications:mark_all_read' %}" class="text-sm text-red-400 hover:text-red-300"><i class="fas fa-check-double mr-1"></i>Mark All Read</a>
+        {% endif %}
+    </div>
+    <div class="glass rounded-2xl border border-gray-700/50 overflow-hidden">
+        <div class="divide-y divide-gray-800/50">
+            {% for notif in notifications %}
+            <a href="{% url 'notifications:mark_read' notif.id %}" class="flex items-start gap-4 p-4 hover:bg-white/5 transition {% if not notif.is_read %}bg-red-500/5{% endif %}">
+                <div class="mt-1">
+                    {% if not notif.is_read %}<span class="notification-dot"></span>{% endif %}
+                </div>
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0
+                    {% if notif.notification_type == 'reward' %}bg-yellow-500/20 text-yellow-400
+                    {% elif notif.notification_type == 'payment' %}bg-green-500/20 text-green-400
+                    {% elif notif.notification_type == 'prediction' %}bg-blue-500/20 text-blue-400
+                    {% elif notif.notification_type == 'withdrawal' %}bg-purple-500/20 text-purple-400
+                    {% else %}bg-gray-500/20 text-gray-400{% endif %}">
+                    {% if notif.notification_type == 'reward' %}<i class="fas fa-trophy"></i>
+                    {% elif notif.notification_type == 'payment' %}<i class="fas fa-credit-card"></i>
+                    {% elif notif.notification_type == 'prediction' %}<i class="fas fa-chart-line"></i>
+                    {% elif notif.notification_type == 'withdrawal' %}<i class="fas fa-money-bill-wave"></i>
+                    {% elif notif.notification_type == 'referral' %}<i class="fas fa-gift"></i>
+                    {% else %}<i class="fas fa-bell"></i>{% endif %}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-white font-medium text-sm {% if not notif.is_read %}font-semibold{% endif %}">{{ notif.title }}</div>
+                    <div class="text-gray-500 text-sm truncate">{{ notif.message }}</div>
+                    <div class="text-gray-700 text-xs mt-1">{{ notif.created_at|timesince }} ago</div>
+                </div>
+            </a>
+            {% empty %}
+            <div class="text-center py-16 text-gray-500">
+                <i class="far fa-bell text-5xl mb-4 text-gray-600"></i>
+                <p>No notifications yet</p>
+                <p class="text-sm mt-2">You'll see updates here when you make predictions or receive rewards</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

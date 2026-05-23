@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Wallet - ZoBet{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-24">
+    <h1 class="text-3xl font-bold text-white mb-8"><i class="fas fa-wallet text-red-400 mr-2"></i>My Wallet</h1>
+    <div class="grid md:grid-cols-3 gap-6 mb-8">
+        <div class="glass rounded-2xl p-6 border border-gray-700/50 md:col-span-2">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <p class="text-gray-500 text-sm">Available Balance</p>
+                    <div class="text-4xl font-black text-white">₹<span id="balance-amount">{{ wallet.available_balance|floatformat:2 }}</span></div>
+                </div>
+                <div class="text-5xl">💰</div>
+            </div>
+            <div class="flex gap-3">
+                <a href="{% url 'wallet:deposit' %}" class="btn-primary flex-1 text-center"><i class="fas fa-plus mr-2"></i>Deposit</a>
+                <a href="{% url 'wallet:withdraw' %}" class="btn-secondary flex-1 text-center"><i class="fas fa-arrow-up mr-2"></i>Withdraw</a>
+            </div>
+            <div class="mt-4 text-sm text-gray-500 flex justify-between">
+                <span>Locked: <span class="text-yellow-400">₹{{ wallet.locked_balance|floatformat:2 }}</span></span>
+                <span>Total: <span class="text-white">₹{{ wallet.balance|floatformat:2 }}</span></span>
+            </div>
+        </div>
+        <div class="glass rounded-2xl p-6 border border-gray-700/50">
+            <h3 class="text-white font-semibold mb-4">Quick Stats</h3>
+            <div class="space-y-3 text-sm">
+                <div class="flex justify-between"><span class="text-gray-500">Deposits</span><span class="text-green-400">{{ transactions|dictsortreversed:"id"|slice:":100"|length }}</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Withdrawals</span><span class="text-red-400">-</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Predictions</span><span class="text-blue-400">{{ user.predictions.count }}</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass rounded-2xl border border-gray-700/50 overflow-hidden">
+        <div class="p-6 border-b border-gray-700/50">
+            <h3 class="text-lg font-semibold text-white"><i class="fas fa-history text-red-400 mr-2"></i>Transaction History</h3>
+        </div>
+        <div class="divide-y divide-gray-800/50">
+            {% for t in transactions %}
+            <div class="flex items-center justify-between p-4 hover:bg-white/5 transition">
+                <div class="flex items-center gap-3">
+                    {% if t.transaction_type == 'deposit' %}<div class="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center text-green-400"><i class="fas fa-arrow-down"></i></div>
+                    {% elif t.transaction_type == 'withdrawal' %}<div class="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center text-red-400"><i class="fas fa-arrow-up"></i></div>
+                    {% elif t.transaction_type == 'event_entry' %}<div class="w-10 h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center text-yellow-400"><i class="fas fa-gamepad"></i></div>
+                    {% elif t.transaction_type == 'reward' %}<div class="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center text-green-400"><i class="fas fa-trophy"></i></div>
+                    {% else %}<div class="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400"><i class="fas fa-exchange-alt"></i></div>{% endif %}
+                    <div>
+                        <div class="text-white text-sm font-medium">{{ t.description|truncatechars:30 }}</div>
+                        <div class="text-gray-600 text-xs">{{ t.created_at|date:"d M Y H:i" }}</div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="{% if t.transaction_type == 'deposit' or t.transaction_type == 'reward' or t.transaction_type == 'referral_bonus' %}text-green-400{% else %}text-red-400{% endif %} font-semibold">
+                        {% if t.transaction_type == 'deposit' or t.transaction_type == 'reward' or t.transaction_type == 'referral_bonus' %}+{% else %}-{% endif %}₹{{ t.amount|floatformat:2 }}
+                    </div>
+                    <div class="text-xs text-gray-600">₹{{ t.balance_after|floatformat:2 }}</div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-12 text-gray-500">
+                <i class="fas fa-receipt text-4xl mb-3 text-gray-600"></i>
+                <p>No transactions yet</p>
+                <a href="{% url 'wallet:deposit' %}" class="text-red-400 text-sm mt-2 inline-block">Make your first deposit</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

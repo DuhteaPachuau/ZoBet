@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load allauth %}
+{% block title %}Sign In Via {{ provider.name }} - ZoBet{% endblock %}
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-20 px-4">
+    <div class="absolute inset-0 bg-gradient-to-b from-red-900/10 via-transparent to-black/50"></div>
+    <div class="relative w-full max-w-md">
+        <div class="text-center mb-8">
+            <div class="text-4xl mb-4">&#9733;</div>
+            <h1 class="text-3xl font-bold text-white">Sign In Via {{ provider.name }}</h1>
+        </div>
+        <div class="glass rounded-2xl p-8 border border-gray-700/50 text-center">
+            <p class="text-gray-400 mb-6">You are about to sign in using a third-party account from <strong class="text-white">{{ provider.name }}</strong>.</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn-primary w-full text-center">Continue</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

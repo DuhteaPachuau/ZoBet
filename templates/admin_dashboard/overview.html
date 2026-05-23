@@ -1,0 +1,160 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% block title %}Admin Overview - ZoBet{% endblock %}
+{% block admin_content %}
+<div class="flex items-center justify-between mb-8">
+    <div>
+        <h1 class="text-3xl font-bold text-white">Overview</h1>
+        <p class="text-gray-500 text-sm mt-1">Platform at a glance</p>
+    </div>
+    <a href="{% url 'events:create_event' %}" class="btn-primary text-sm"><i class="fas fa-plus mr-2"></i>Create Event</a>
+</div>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="stat-card">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-gray-500 text-sm">Total Users</span>
+            <div class="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400"><i class="fas fa-users"></i></div>
+        </div>
+        <div class="text-3xl font-bold text-white">{{ total_users }}</div>
+        <div class="text-xs text-green-400 mt-1">+{{ new_users_this_month }} this month</div>
+    </div>
+    <div class="stat-card">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-gray-500 text-sm">Revenue</span>
+            <div class="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center text-green-400"><i class="fas fa-dollar-sign"></i></div>
+        </div>
+        <div class="text-3xl font-bold text-green-400">₹{{ total_revenue|floatformat:0 }}</div>
+        <div class="text-xs text-green-400 mt-1">+₹{{ revenue_this_month|floatformat:0 }} this month</div>
+    </div>
+    <div class="stat-card">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-gray-500 text-sm">Active Events</span>
+            <div class="w-10 h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center text-yellow-400"><i class="fas fa-bolt"></i></div>
+        </div>
+        <div class="text-3xl font-bold text-yellow-400">{{ active_events }}</div>
+        <div class="text-xs text-gray-500 mt-1">{{ total_events }} total events</div>
+    </div>
+    <div class="stat-card">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-gray-500 text-sm">Predictions</span>
+            <div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400"><i class="fas fa-chart-line"></i></div>
+        </div>
+        <div class="text-3xl font-bold text-purple-400">{{ total_predictions }}</div>
+        <div class="text-xs text-green-400 mt-1">{{ correct_predictions }} correct</div>
+    </div>
+</div>
+
+<div class="grid lg:grid-cols-2 gap-6 mb-8">
+    <div class="glass rounded-2xl border border-gray-700/50 overflow-hidden">
+        <div class="p-5 border-b border-gray-700/50 flex items-center justify-between">
+            <h3 class="text-white font-semibold"><i class="fas fa-clock text-yellow-400 mr-2"></i>Pending Withdrawals</h3>
+            <a href="{% url 'admin_withdrawals' %}" class="text-xs text-red-400 hover:text-red-300">View all</a>
+        </div>
+        <div>
+            {% for wr in pending_withdrawals %}
+            <div class="flex items-center justify-between p-4 hover:bg-white/5 transition border-b border-gray-800/30">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 overflow-hidden {% if wr.user.profile.profile_image %}{% else %}bg-yellow-500/20 text-yellow-400{% endif %}">
+                        {% if wr.user.profile.profile_image %}
+                        <img src="{{ wr.user.profile.profile_image.url }}" class="w-full h-full object-cover">
+                        {% else %}
+                        {{ wr.user.username|first|upper }}
+                        {% endif %}
+                    </div>
+                    <div>
+                        <div class="text-white text-sm font-medium">{{ wr.user.username }}</div>
+                        <div class="text-gray-500 text-xs">{{ wr.upi_id }}</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-yellow-400 font-bold">₹{{ wr.amount|floatformat:0 }}</span>
+                    <div class="flex gap-1">
+                        <a href="{% url 'approve_withdrawal' wr.id %}" class="w-7 h-7 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400 hover:bg-green-500/30 transition" title="Approve"><i class="fas fa-check text-xs"></i></a>
+                        <a href="{% url 'reject_withdrawal' wr.id %}" class="w-7 h-7 rounded-lg bg-red-500/20 flex items-center justify-center text-red-400 hover:bg-red-500/30 transition" title="Reject"><i class="fas fa-times text-xs"></i></a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-10 text-gray-500 text-sm">All clear — no pending withdrawals</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="glass rounded-2xl border border-gray-700/50 overflow-hidden">
+        <div class="p-5 border-b border-gray-700/50 flex items-center justify-between">
+            <h3 class="text-white font-semibold"><i class="fas fa-history text-blue-400 mr-2"></i>Recent Transactions</h3>
+        </div>
+        <div>
+            {% for t in recent_transactions %}
+            <div class="flex items-center justify-between p-4 hover:bg-white/5 transition border-b border-gray-800/30">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center text-sm
+                        {% if t.transaction_type == 'deposit' %}bg-green-500/20 text-green-400
+                        {% elif t.transaction_type == 'reward' %}bg-yellow-500/20 text-yellow-400
+                        {% else %}bg-red-500/20 text-red-400{% endif %}">
+                        <i class="fas fa-{% if t.transaction_type == 'deposit' %}arrow-down{% elif t.transaction_type == 'reward' %}trophy{% else %}arrow-up{% endif %}"></i>
+                    </div>
+                    <div>
+                        <div class="text-white text-sm">{{ t.user.username }}</div>
+                        <div class="text-gray-600 text-xs">{{ t.get_transaction_type_display }}</div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm font-semibold {% if t.transaction_type == 'deposit' or t.transaction_type == 'reward' %}text-green-400{% else %}text-red-400{% endif %}">
+                        ₹{{ t.amount|floatformat:0 }}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-10 text-gray-500 text-sm">No transactions yet</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="grid lg:grid-cols-2 gap-6">
+    <div class="glass rounded-2xl border border-gray-700/50 overflow-hidden">
+        <div class="p-5 border-b border-gray-700/50">
+            <h3 class="text-white font-semibold"><i class="fas fa-calendar text-red-400 mr-2"></i>Recent Events</h3>
+        </div>
+        <div>
+            {% for e in recent_events %}
+            <a href="{% url 'events:detail' e.id %}" class="flex items-center justify-between p-4 hover:bg-white/5 transition border-b border-gray-800/30">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-red-500/20 flex items-center justify-center text-red-400 text-sm"><i class="fas fa-trophy"></i></div>
+                    <div>
+                        <div class="text-white text-sm font-medium">{{ e.title|truncatechars:25 }}</div>
+                        <div class="text-gray-500 text-xs">{{ e.participant_count }} participants</div>
+                    </div>
+                </div>
+                <span class="badge {% if e.status == 'live' %}badge-success{% elif e.status == 'upcoming' %}badge-warning{% else %}badge-info{% endif %} text-xs">{{ e.status }}</span>
+            </a>
+            {% empty %}
+            <div class="text-center py-10 text-gray-500 text-sm">No events created yet</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="glass rounded-2xl border border-gray-700/50 overflow-hidden">
+        <div class="p-5 border-b border-gray-700/50">
+            <h3 class="text-white font-semibold"><i class="fas fa-user-plus text-green-400 mr-2"></i>New Users</h3>
+        </div>
+        <div>
+            {% for u in recent_users %}
+            <div class="flex items-center justify-between p-4 hover:bg-white/5 transition border-b border-gray-800/30">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 text-sm font-bold">{{ u.username|first|upper }}</div>
+                    <div>
+                        <div class="text-white text-sm font-medium">{{ u.username }}</div>
+                        <div class="text-gray-500 text-xs">{{ u.email }}</div>
+                    </div>
+                </div>
+                <div class="text-xs text-gray-600">{{ u.date_joined|date:"d M" }}</div>
+            </div>
+            {% empty %}
+            <div class="text-center py-10 text-gray-500 text-sm">No users yet</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

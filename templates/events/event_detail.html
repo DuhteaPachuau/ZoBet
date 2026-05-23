@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% block title %}{{ event.title }} - ZoBet{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-3 sm:px-4 py-20 sm:py-24">
+    <div class="grid lg:grid-cols-3 gap-6 sm:gap-8">
+        <div class="lg:col-span-2">
+            <div class="glass rounded-xl sm:rounded-2xl overflow-hidden border border-gray-700/50 mb-4 sm:mb-6">
+                {% if event.banner %}<img src="{{ event.banner.url }}" class="w-full h-48 sm:h-64 object-cover" alt="">{% endif %}
+                <div class="p-4 sm:p-6">
+                    <div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4 flex-wrap">
+                        {% if event.status == 'upcoming' %}<span class="badge badge-warning"><i class="far fa-clock"></i> Upcoming</span>
+                        {% elif event.status == 'live' %}<span class="badge badge-success"><i class="fas fa-circle text-xs"></i> Live</span>
+                        {% else %}<span class="badge badge-info"><i class="fas fa-check"></i> Completed</span>{% endif %}
+                        {% if event.featured %}<span class="badge badge-danger"><i class="fas fa-star"></i> Featured</span>{% endif %}
+                    </div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">{{ event.title }}</h1>
+                    <p class="text-sm sm:text-base text-gray-400 mb-4 sm:mb-6">{{ event.description }}</p>
+
+                    {% if event.winner_declared and event.winner %}
+                    <div class="glass rounded-xl p-4 sm:p-6 border border-green-500/30 bg-green-500/5 mb-4 sm:mb-6">
+                        <div class="text-center">
+                            <span class="text-3xl sm:text-4xl">🏆</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-green-400 mt-2">{{ event.winner.name }}</h3>
+                            <p class="text-gray-400 text-xs sm:text-sm">Declared Champion</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if event.is_prediction_open %}
+            <h2 class="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4"><i class="fas fa-users text-red-400 mr-2"></i>Select Your Champion</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                {% for team in teams %}
+                 <div class="team-card p-4 sm:p-5 {% if user_prediction and user_prediction.team.id == team.id %}selected{% endif %}"
+                     onclick="selectTeam({{ team.id }}, '{{ team.name }}')">
+                    <div class="flex items-center gap-3 sm:gap-4">
+                        {% if team.logo %}<img src="{{ team.logo.url }}" class="w-10 h-10 sm:w-14 sm:h-14 rounded-xl object-cover" alt="">{% endif %}
+                        <div class="min-w-0">
+                            <h3 class="text-sm sm:text-base text-white font-bold truncate">{{ team.name }}</h3>
+                            {% if team.short_code %}<span class="text-[10px] sm:text-xs text-gray-500">{{ team.short_code }}</span>{% endif %}
+                        </div>
+                    </div>
+                    {% if team.description %}<p class="text-gray-500 text-[10px] sm:text-xs mt-2">{{ team.description|truncatechars:80 }}</p>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if user.is_authenticated and can_predict %}
+            <div id="predict-section" class="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700/50 text-center hidden">
+                <form method="POST" action="{% url 'events:predict' event.id 0 %}" id="predictForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="team_id" id="selectedTeamId">
+                    <p class="text-sm sm:text-base text-white mb-2">Predicting: <span id="selectedTeamName" class="text-red-400 font-bold"></span></p>
+                    <div class="mb-3 sm:mb-4">
+                        <label class="text-gray-500 text-xs sm:text-sm block mb-1.5">Your Bet Amount</label>
+                        <div class="flex items-center justify-center gap-2">
+                            <span class="text-green-400 font-bold text-lg">₹</span>
+                            <input type="number" name="bet_amount" id="betAmount" min="{{ event.entry_fee }}" step="1" value="{{ event.entry_fee }}" class="w-32 text-center bg-white/5 border border-gray-700/50 rounded-xl px-3 py-2 text-white text-lg font-bold focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/30">
+                        </div>
+                        <p class="text-[10px] text-gray-600 mt-1">Min: ₹{{ event.entry_fee }}</p>
+                    </div>
+                    <p class="text-[10px] sm:text-xs text-gray-600 mb-3 sm:mb-4">You get proportional share of prize pool if you win</p>
+                    <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
+                        <button type="button" onclick="submitPrediction()" class="btn-primary text-sm"><i class="fas fa-check mr-2"></i>Confirm Bet</button>
+                        <button type="button" onclick="cancelSelection()" class="btn-secondary text-sm">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            {% elif user_prediction %}
+            <div class="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-green-500/30 bg-green-500/5 text-center">
+                <i class="fas fa-check-circle text-green-400 text-2xl sm:text-3xl mb-2"></i>
+                <p class="text-sm sm:text-base text-white font-semibold">Your Prediction: <span class="text-green-400">{{ user_prediction.team.name }}</span></p>
+                <p class="text-gray-500 text-[10px] sm:text-xs mt-1">Submitted on {{ user_prediction.created_at|date:"d M Y" }}</p>
+            </div>
+            {% elif not user.is_authenticated %}
+            <div class="glass rounded-xl sm:rounded-2xl p-6 sm:p-8 text-center">
+                <p class="text-gray-400 text-sm sm:text-base mb-4">Sign in to make your prediction</p>
+                <a href="{% url 'accounts:login' %}" class="btn-primary text-sm">Sign In to Predict</a>
+            </div>
+            {% endif %}
+
+            {% elif event.status == 'completed' %}
+            <div class="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center border border-gray-700/50">
+                <i class="fas fa-lock text-gray-500 text-2xl sm:text-3xl mb-2"></i>
+                <p class="text-sm sm:text-base text-gray-400">This event has ended</p>
+            </div>
+            {% else %}
+            <div class="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center border border-gray-700/50">
+                <i class="far fa-clock text-yellow-400 text-2xl sm:text-3xl mb-2"></i>
+                <p class="text-sm sm:text-base text-gray-400">Predictions open until {{ event.prediction_deadline|date:"d M Y H:i" }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="space-y-4 sm:space-y-6">
+            <div class="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700/50">
+                <h3 class="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4"><i class="fas fa-info-circle text-red-400 mr-2"></i>Event Details</h3>
+                <div class="space-y-2 sm:space-y-3 text-xs sm:text-sm">
+                    <div class="flex justify-between"><span class="text-gray-500">Prize Pool</span><span class="text-green-400 font-bold">₹{{ event.prize_pool|floatformat:0 }}</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Min Bet</span><span class="text-white font-semibold">₹{{ event.entry_fee|floatformat:0 }}</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Commission</span><span class="text-yellow-400">{{ event.commission_percentage }}%</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Participants</span><span class="text-white">{{ event.participant_count }}</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Teams</span><span class="text-white">{{ event.teams.count }}</span></div>
+                    <hr class="border-gray-700/50">
+                    <div class="flex justify-between"><span class="text-gray-500">Starts</span><span class="text-blue-400">{{ event.start_date|date:"d M Y H:i" }}</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Ends</span><span class="text-blue-400">{{ event.end_date|date:"d M Y H:i" }}</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Deadline</span><span class="text-red-400">{{ event.prediction_deadline|date:"d M Y H:i" }}</span></div>
+                </div>
+            </div>
+
+            {% if user.is_staff %}
+            <div class="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-yellow-500/30">
+                <h3 class="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4"><i class="fas fa-shield-alt text-yellow-400 mr-2"></i>Admin Actions</h3>
+                <div class="space-y-2">
+                    <a href="{% url 'events:edit_event' event.id %}" class="btn-secondary w-full text-center text-xs sm:text-sm block"><i class="fas fa-edit mr-2"></i>Edit Event</a>
+                    {% if event.status != 'completed' %}
+                    <button onclick="document.getElementById('winnerModal').classList.remove('hidden')" class="btn-primary w-full text-center text-xs sm:text-sm"><i class="fas fa-crown mr-2"></i>Declare Winner</button>
+                    {% endif %}
+                    <a href="{% url 'events:add_teams' event.id %}" class="btn-secondary w-full text-center text-xs sm:text-sm block"><i class="fas fa-users mr-2"></i>Manage Teams</a>
+                </div>
+            </div>
+            {% endif %}
+
+            <div id="winnerModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+                <div class="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-md w-full border border-gray-700/50 max-h-[90vh] overflow-y-auto">
+                    <h3 class="text-base sm:text-lg font-bold text-white mb-4">Declare Winner</h3>
+                    <form method="POST" action="{% url 'events:declare_winner' event.id %}">
+                        {% csrf_token %}
+                        <div class="space-y-2 sm:space-y-3 mb-4">
+                            {% for team in teams %}
+                            <label class="flex items-center gap-3 p-3 rounded-xl bg-white/5 cursor-pointer hover:bg-white/10 transition">
+                                <input type="radio" name="winner_team" value="{{ team.id }}" class="accent-red-500 w-4 h-4">
+                                <span class="text-white text-sm sm:text-base">{{ team.name }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                            <button type="submit" class="btn-primary flex-1 text-center text-xs sm:text-sm">Confirm Winner</button>
+                            <button type="button" onclick="document.getElementById('winnerModal').classList.add('hidden')" class="btn-secondary flex-1 text-center text-xs sm:text-sm">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if user.is_authenticated and user_prediction %}
+            <div class="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700/50">
+                <h3 class="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4"><i class="fas fa-chart-pie text-red-400 mr-2"></i>Your Prediction</h3>
+                <div class="text-center">
+                    <div class="text-2xl sm:text-3xl mb-2">🎯</div>
+                    <p class="text-sm sm:text-base text-white font-bold">{{ user_prediction.team.name }}</p>
+                    <p class="text-gray-500 text-xs">Bet: ₹{{ user_prediction.bet_amount|floatformat:0 }}</p>
+                    {% if user_prediction.is_correct == True %}
+                    <p class="text-green-400 text-xs sm:text-sm mt-2">You won! +₹{{ user_prediction.reward_amount|floatformat:2 }}</p>
+                    {% elif user_prediction.is_correct == False %}
+                    <p class="text-red-400 text-xs sm:text-sm mt-2">Not correct this time</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let selectedTeamId = null;
+    function selectTeam(teamId, teamName) {
+        selectedTeamId = teamId;
+        document.getElementById('selectedTeamId').value = teamId;
+        document.getElementById('selectedTeamName').textContent = teamName;
+        document.querySelectorAll('.team-card').forEach(c => c.classList.remove('selected'));
+        event.currentTarget.classList.add('selected');
+        document.getElementById('predict-section').classList.remove('hidden');
+    }
+    function cancelSelection() {
+        selectedTeamId = null;
+        document.getElementById('predict-section').classList.add('hidden');
+        document.querySelectorAll('.team-card').forEach(c => c.classList.remove('selected'));
+    }
+    function submitPrediction() {
+        if (!selectedTeamId) return;
+        const bet = document.getElementById('betAmount').value;
+        if (!bet || parseFloat(bet) < {{ event.entry_fee }}) {
+            alert('Minimum bet is ₹{{ event.entry_fee }}');
+            return;
+        }
+        const form = document.getElementById('predictForm');
+        form.action = form.action.replace('/0/', '/' + selectedTeamId + '/');
+        form.submit();
+    }
+</script>
+{% endblock %}

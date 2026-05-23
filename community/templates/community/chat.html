@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% block title %}Community Chat - ZoBet{% endblock %}
+{% block content %}
+<section class="py-4 sports-pattern">
+    <div class="max-w-4xl mx-auto px-4">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h1 class="text-xl font-bold text-white"><i class="fas fa-comments text-red-400 mr-2"></i>Chat</h1>
+                <p class="text-gray-500 text-xs">Chat with fellow predictors</p>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+                <span id="online-dot" class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                <span class="text-gray-500">{{ messages|length }} messages</span>
+                <button onclick="scrollToBottom()" class="text-gray-600 hover:text-white transition"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+
+        <div class="glass rounded-xl border border-gray-700/50 overflow-hidden mb-2">
+            <div class="h-[350px] overflow-y-auto p-2.5 space-y-1.5 scroll-smooth" id="chat-messages">
+                {% for msg in messages reversed %}
+                <div class="flex items-start gap-2 message-bubble {% if msg.user == user %}flex-row-reverse animate-slide-left{% else %}animate-slide-right{% endif %}" data-id="{{ msg.id }}">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 overflow-hidden {% if msg.user.profile.profile_image %}{% else %}{% if msg.user.is_staff %}bg-gradient-to-br from-red-500 to-yellow-500 text-white{% elif msg.user == user %}bg-red-500/20 text-red-400{% else %}bg-gray-700/50 text-gray-300{% endif %}{% endif %}">
+                        {% if msg.user.profile.profile_image %}
+                        <img src="{{ msg.user.profile.profile_image.url }}" class="w-full h-full object-cover">
+                        {% else %}
+                        {{ msg.user.username|first|upper }}
+                        {% endif %}
+                    </div>
+                    <div class="max-w-[80%] {% if msg.user == user %}bg-red-500/15 border-red-500/30{% else %}bg-white/[0.04]{% endif %} rounded-2xl px-3 py-1.5 border border-gray-700/40">
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <span class="text-xs font-semibold {% if msg.user == user %}text-red-400{% else %}text-gray-200{% endif %}">
+                                {{ msg.user.username }}
+                                {% if msg.user.is_staff %}<span class="text-yellow-400 text-[10px]">★</span>{% endif %}
+                            </span>
+                            <span class="text-[10px] text-gray-600">{{ msg.created_at|date:"h:i A" }}</span>
+                        </div>
+                        <p class="text-sm text-gray-300 break-words leading-relaxed">{{ msg.message }}</p>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="flex flex-col items-center justify-center h-full text-gray-500" id="empty-state">
+                    <div class="text-6xl mb-4 opacity-30">💬</div>
+                    <p class="text-lg font-medium text-gray-400">No messages yet</p>
+                    <p class="text-sm text-gray-600">Be the first to say something!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <form method="post" class="flex gap-2" id="chat-form">
+            {% csrf_token %}
+            <div class="flex-1 relative">
+                <input type="text" name="message" maxlength="500" required autocomplete="off" placeholder="Type a message..." id="msg-input" class="w-full bg-white/5 border border-gray-700/50 rounded-xl pl-4 pr-12 py-2 text-white text-sm focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/30 transition placeholder-gray-600">
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-gray-600" id="char-count">0/500</span>
+            </div>
+            <button type="submit" class="btn-primary text-sm px-4 py-2" id="send-btn"><i class="fas fa-paper-plane mr-1"></i>Send</button>
+        </form>
+    </div>
+</section>
+
+<style>
+    .message-bubble { transition: opacity 0.3s ease, transform 0.3s ease; }
+    .message-bubble:hover { opacity: 0.85; }
+    @keyframes slide-left { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes slide-right { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+    .animate-slide-left { animation: slide-left 0.25s ease-out; }
+    .animate-slide-right { animation: slide-right 0.25s ease-out; }
+    #chat-messages::-webkit-scrollbar { width: 4px; }
+    #chat-messages::-webkit-scrollbar-track { background: transparent; }
+    #chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+</style>
+
+<script>
+    let latestId = {{ messages.0.id|default:0 }};
+    let polling = true;
+
+    function scrollToBottom() {
+        const el = document.getElementById('chat-messages');
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function appendMessage(m) {
+        const container = document.getElementById('chat-messages');
+        const empty = document.getElementById('empty-state');
+        if (empty) empty.remove();
+        const isMe = m.username === '{{ user.username|escapejs }}';
+        const div = document.createElement('div');
+        div.className = `flex items-start gap-3 message-bubble ${isMe ? 'flex-row-reverse animate-slide-left' : 'animate-slide-right'}`;
+        div.dataset.id = m.id;
+        const avatarHtml = m.profile_image
+            ? `<img src="${m.profile_image}" class="w-full h-full object-cover">`
+            : m.initial;
+        const avatarBg = m.profile_image ? '' : (m.is_staff ? 'bg-gradient-to-br from-red-500 to-yellow-500 text-white' : isMe ? 'bg-red-500/20 text-red-400' : 'bg-gray-700/50 text-gray-300');
+        div.innerHTML = `
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 overflow-hidden ${avatarBg}">${avatarHtml}</div>
+            <div class="max-w-[80%] ${isMe ? 'bg-red-500/15 border-red-500/30' : 'bg-white/[0.04]'} rounded-2xl px-3 py-1.5 border border-gray-700/40">
+                <div class="flex items-center gap-2 mb-0.5">
+                    <span class="text-xs font-semibold ${isMe ? 'text-red-400' : 'text-gray-200'}">${m.username}${m.is_staff ? '<span class="text-yellow-400 text-[10px]">★</span>' : ''}</span>
+                    <span class="text-[10px] text-gray-600">${m.time}</span>
+                </div>
+                <p class="text-sm text-gray-300 break-words leading-relaxed">${m.message.replace(/</g, '&lt;')}</p>
+            </div>`;
+        container.appendChild(div);
+        scrollToBottom();
+    }
+
+    async function pollMessages() {
+        if (!polling) return;
+        try {
+            const r = await fetch(`{% url 'community:chat_api' %}?since=${latestId}`);
+            const data = await r.json();
+            if (data.messages.length) {
+                data.messages.reverse().forEach(appendMessage);
+                latestId = data.latest_id;
+            }
+        } catch (e) {}
+        setTimeout(pollMessages, 4000);
+    }
+
+    document.getElementById('chat-form').addEventListener('submit', function(e) {
+        const input = document.getElementById('msg-input');
+        if (!input.value.trim()) { e.preventDefault(); return; }
+    });
+
+    document.getElementById('msg-input').addEventListener('input', function() {
+        document.getElementById('char-count').textContent = `${this.value.length}/500`;
+    });
+
+    document.getElementById('msg-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            document.getElementById('send-btn').click();
+        }
+    });
+
+    scrollToBottom();
+
+    {% if user.is_authenticated %}
+    setTimeout(pollMessages, 2000);
+    {% endif %}
+</script>
+{% endblock %}

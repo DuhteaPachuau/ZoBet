@@ -1,0 +1,64 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% block title %}Manage Events - ZoBet{% endblock %}
+{% block admin_content %}
+<div class="flex items-center justify-between mb-8">
+    <div>
+        <h1 class="text-3xl font-bold text-white"><i class="fas fa-trophy text-red-400 mr-2"></i>Events</h1>
+        <p class="text-gray-500 text-sm mt-1">{{ events|length }} total events</p>
+    </div>
+    <a href="{% url 'events:create_event' %}" class="btn-primary text-sm"><i class="fas fa-plus mr-2"></i>Create Event</a>
+</div>
+
+<div class="glass rounded-2xl border border-gray-700/50 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-gray-700/50 text-left">
+                    <th class="px-5 py-4 text-gray-400 text-sm font-medium">Event</th>
+                    <th class="px-5 py-4 text-gray-400 text-sm font-medium hidden md:table-cell">Status</th>
+                    <th class="px-5 py-4 text-gray-400 text-sm font-medium hidden sm:table-cell">Min Bet</th>
+                    <th class="px-5 py-4 text-gray-400 text-sm font-medium">Prize Pool</th>
+                    <th class="px-5 py-4 text-gray-400 text-sm font-medium hidden md:table-cell">Participants</th>
+                    <th class="px-5 py-4 text-gray-400 text-sm font-medium">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800/30">
+                {% for e in events %}
+                <tr class="hover:bg-white/5 transition">
+                    <td class="px-5 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center text-red-400"><i class="fas fa-trophy"></i></div>
+                            <div>
+                                <div class="text-white font-medium">{{ e.title|truncatechars:25 }}</div>
+                                <div class="text-gray-600 text-xs">{{ e.created_at|date:"d M Y" }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-5 py-4 hidden md:table-cell">
+                        <span class="badge {% if e.status == 'live' %}badge-success{% elif e.status == 'upcoming' %}badge-warning{% elif e.status == 'completed' %}badge-info{% else %}badge-danger{% endif %}">
+                            {{ e.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="px-5 py-4 hidden sm:table-cell text-white">₹{{ e.entry_fee|floatformat:0 }}</td>
+                    <td class="px-5 py-4 text-green-400 font-semibold">₹{{ e.prize_pool|floatformat:0 }}</td>
+                    <td class="px-5 py-4 hidden md:table-cell text-white">{{ e.participant_count }}</td>
+                    <td class="px-5 py-4">
+                        <div class="flex gap-2">
+                            <a href="{% url 'events:detail' e.id %}" class="px-3 py-1.5 rounded-lg bg-white/10 text-white text-xs hover:bg-white/20 transition">View</a>
+                            <a href="{% url 'events:edit_event' e.id %}" class="px-3 py-1.5 rounded-lg bg-yellow-500/20 text-yellow-400 text-xs hover:bg-yellow-500/30 transition">Edit</a>
+                            {% if e.status != 'completed' and e.teams.exists %}
+                            <a href="{% url 'events:detail' e.id %}#winnerModal" class="px-3 py-1.5 rounded-lg bg-green-500/20 text-green-400 text-xs hover:bg-green-500/30 transition hidden sm:inline">Declare</a>
+                            {% endif %}
+                            <a href="{% url 'events:add_teams' e.id %}" class="px-3 py-1.5 rounded-lg bg-blue-500/20 text-blue-400 text-xs hover:bg-blue-500/30 transition hidden sm:inline">Teams</a>
+                            <a href="#" onclick="return confirmDelete('{% url 'delete_event' e.id %}')" class="px-3 py-1.5 rounded-lg bg-red-500/20 text-red-400 text-xs hover:bg-red-500/30 transition">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center py-16 text-gray-500">No events yet. <a href="{% url 'events:create_event' %}" class="text-red-400">Create your first event</a></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

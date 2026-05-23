@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ZoBet - Tournament Prediction{% endblock %}</title>
+    <meta name="description" content="ZoBet - Mizoram's tournament prediction platform. Predict winners, win rewards, and compete with friends.">
+    <meta name="keywords" content="tournament prediction, Mizoram, sports prediction, win money, local tournaments">
+    <meta property="og:title" content="ZoBet - Mizoram Tournament Prediction">
+    <meta property="og:description" content="Predict local tournament champions and win rewards!">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://i.ibb.co/1GK95pjv/Chat-GPT-Image-May-23-2026-06-52-46-PM.png">
+    <meta name="theme-color" content="#ef4444">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='85' font-weight='900' font-family='Arial' fill='%23ef4444'>Z</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: #0a0a0f; color: #e0e0e0; }
+        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+        .glass-hover:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+        .neon-glow { box-shadow: 0 0 20px rgba(239,68,68,0.3), 0 0 40px rgba(239,68,68,0.1); }
+        .neon-border { border: 1px solid rgba(239,68,68,0.3); }
+        .neon-text { color: #ef4444; text-shadow: 0 0 20px rgba(239,68,68,0.5); }
+        .gradient-primary { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .sports-pattern { background-image: radial-gradient(circle at 1px 1px, rgba(239,68,68,0.1) 1px, transparent 0); background-size: 40px 40px; }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        .animate-pulse-glow { animation: pulseGlow 2s ease-in-out infinite; }
+        @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 10px rgba(239,68,68,0.3); } 50% { box-shadow: 0 0 30px rgba(239,68,68,0.6); } }
+        .animate-slide-up { animation: slideUp 0.5s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .btn-primary { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; padding: 12px 24px; border-radius: 12px; font-weight: 600; transition: all 0.3s; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(239,68,68,0.4); }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: white; padding: 12px 24px; border-radius: 12px; font-weight: 600; transition: all 0.3s; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-secondary:hover { background: rgba(255,255,255,0.15); border-color: rgba(239,68,68,0.5); }
+        .btn-sm { padding: 8px 16px; font-size: 13px; }
+        input, textarea, select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 12px; padding: 12px 16px; width: 100%; outline: none; transition: all 0.3s; }
+        input:focus, textarea:focus, select:focus { border-color: #ef4444; box-shadow: 0 0 0 2px rgba(239,68,68,0.2); }
+        .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 24px; transition: all 0.3s; }
+        .stat-card:hover { border-color: rgba(239,68,68,0.3); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+        .stat-card-sm { padding: 16px; }
+        .team-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; transition: all 0.3s; cursor: pointer; }
+        .team-card:hover { border-color: rgba(239,68,68,0.4); transform: translateY(-4px); }
+        .team-card.selected { border-color: #ef4444; background: rgba(239,68,68,0.1); box-shadow: 0 0 20px rgba(239,68,68,0.2); }
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+        .badge-success { background: rgba(34,197,94,0.2); color: #22c55e; }
+        .badge-warning { background: rgba(234,179,8,0.2); color: #eab308; }
+        .badge-danger { background: rgba(239,68,68,0.2); color: #ef4444; }
+        .badge-info { background: rgba(59,130,246,0.2); color: #3b82f6; }
+        .sidebar-link { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-radius: 12px; transition: all 0.3s; color: #9ca3af; text-decoration: none; }
+        .sidebar-link:hover { background: rgba(239,68,68,0.1); color: #ef4444; }
+        .sidebar-link.active { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+        .notification-dot { width: 8px; height: 8px; background: #ef4444; border-radius: 50%; display: inline-block; animation: pulseGlow 2s ease-in-out infinite; }
+        .toast { position: fixed; bottom: 16px; right: 16px; z-index: 9999; animation: slideUp 0.3s ease-out; max-width: calc(100vw - 32px); }
+        .mobile-nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 40; display: none; }
+        .mobile-nav-overlay.open { display: block; }
+        @media (max-width: 640px) {
+            .stat-card { padding: 16px; }
+            .btn-primary, .btn-secondary { padding: 10px 18px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-gray-800/50">
+        <div class="max-w-7xl mx-auto px-3 sm:px-4">
+            <div class="flex items-center justify-between h-14 sm:h-16">
+                <a href="{% url 'home' %}" class="flex items-center gap-2 flex-shrink-0">
+                    <svg viewBox="0 0 180 48" class="h-10 sm:h-14 w-auto" fill="none">
+                        <defs>
+                            <linearGradient id="zog" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#fff"/>
+                                <stop offset="100%" stop-color="#e5e5e5"/>
+                            </linearGradient>
+                            <linearGradient id="betg" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#ef4444"/>
+                                <stop offset="100%" stop-color="#dc2626"/>
+                            </linearGradient>
+                        </defs>
+                        <text x="0" y="34" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-size="36" fill="url(#zog)" letter-spacing="-1">Zo</text>
+                        <text x="46" y="34" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-size="36" fill="url(#betg)" letter-spacing="-1">Bet</text>
+                        <rect x="0" y="40" width="44" height="3" rx="1.5" fill="url(#betg)"/>
+                    </svg>
+                </a>
+                <div class="hidden md:flex items-center gap-5">
+                    <a href="{% url 'events:list' %}" class="text-gray-400 hover:text-white transition text-sm font-medium">Events</a>
+                    <a href="{% url 'leaderboard:index' %}" class="text-gray-400 hover:text-white transition text-sm font-medium">Leaderboard</a>
+                    <a href="{% url 'community:chat' %}" class="text-gray-400 hover:text-white transition text-sm font-medium">Community</a>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'predictions:my_predictions' %}" class="text-gray-400 hover:text-white transition text-sm font-medium">My Predictions</a>
+                    {% endif %}
+                    {% if user.is_staff %}
+                    <a href="{% url 'admin_dashboard' %}" class="text-red-400 hover:text-red-300 transition text-sm font-medium"><i class="fas fa-shield-alt mr-1"></i>Admin</a>
+                    {% endif %}
+                </div>
+                <div class="flex items-center gap-1.5 sm:gap-3">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'notifications:list' %}" class="relative text-gray-400 hover:text-white transition p-2">
+                        <i class="far fa-bell text-base sm:text-lg"></i>
+                        <span id="notif-count" class="absolute top-0.5 right-0.5 bg-red-500 text-white text-[10px] rounded-full w-3.5 h-3.5 flex items-center justify-center" style="display:none;">0</span>
+                    </a>
+                    <a href="{% url 'wallet:wallet' %}" class="hidden sm:flex items-center gap-1 text-xs sm:text-sm font-semibold text-green-400 bg-green-400/10 px-2.5 sm:px-3 py-1.5 rounded-full border border-green-400/20">
+                        <i class="fas fa-wallet text-[10px] sm:text-xs"></i>
+                        <span id="wallet-balance">₹{{ user.wallet.available_balance|floatformat:0 }}</span>
+                    </a>
+                    <a href="{% url 'accounts:profile' %}" class="flex items-center gap-1.5 sm:gap-2 text-gray-300 hover:text-white transition px-2 sm:px-3 py-1.5 rounded-lg hover:bg-white/5">
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold flex-shrink-0 overflow-hidden {% if user.profile.profile_image %}{% else %}bg-red-500/20 text-red-400{% endif %}">
+                            {% if user.profile.profile_image %}
+                            <img src="{{ user.profile.profile_image.url }}" class="w-full h-full object-cover">
+                            {% else %}
+                            {{ user.username|first|upper }}
+                            {% endif %}
+                        </div>
+                        <span class="hidden sm:block text-sm">{{ user.username }}</span>
+                    </a>
+                    <a href="#" onclick="return confirmLogout()" class="hidden md:flex items-center text-gray-400 hover:text-red-400 transition text-sm px-2" title="Logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                    <button class="md:hidden text-gray-400 hover:text-white p-2" onclick="toggleMobileMenu()">
+                        <i class="fas fa-bars text-lg" id="menu-icon"></i>
+                    </button>
+                    {% else %}
+                    <a href="{% url 'accounts:login' %}" class="text-gray-300 hover:text-white transition text-xs sm:text-sm font-medium">Login</a>
+                    <a href="{% url 'accounts:register' %}" class="btn-primary text-xs sm:text-sm py-2 px-3 sm:px-5">Join Now</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="mobile-menu" class="fixed top-14 left-0 right-0 bottom-0 z-40 hidden">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="toggleMobileMenu()"></div>
+        <div class="relative glass h-full overflow-y-auto p-6">
+            <div class="space-y-3">
+                <a href="{% url 'events:list' %}" class="block sidebar-link text-base" onclick="toggleMobileMenu()"><i class="fas fa-trophy w-6 text-center"></i>Events</a>
+                <a href="{% url 'leaderboard:index' %}" class="block sidebar-link text-base" onclick="toggleMobileMenu()"><i class="fas fa-crown w-6 text-center"></i>Leaderboard</a>
+                <a href="{% url 'community:chat' %}" class="block sidebar-link text-base" onclick="toggleMobileMenu()"><i class="fas fa-comments w-6 text-center"></i>Community</a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'predictions:my_predictions' %}" class="block sidebar-link text-base" onclick="toggleMobileMenu()"><i class="fas fa-chart-line w-6 text-center"></i>My Predictions</a>
+                <a href="{% url 'dashboard:index' %}" class="block sidebar-link text-base" onclick="toggleMobileMenu()"><i class="fas fa-th-large w-6 text-center"></i>Dashboard</a>
+                <a href="{% url 'wallet:wallet' %}" class="block sidebar-link text-base" onclick="toggleMobileMenu()"><i class="fas fa-wallet w-6 text-center"></i>Wallet</a>
+                <a href="{% url 'accounts:profile' %}" class="block sidebar-link text-base" onclick="toggleMobileMenu()"><i class="fas fa-user w-6 text-center"></i>Profile</a>
+                <hr class="border-gray-700/50 my-3">
+                <a href="{% url 'wallet:wallet' %}" class="flex items-center gap-3 p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm font-semibold" onclick="toggleMobileMenu()">
+                    <i class="fas fa-wallet w-6 text-center"></i>Balance: ₹{{ user.wallet.available_balance|floatformat:0 }}
+                </a>
+                <a href="#" onclick="toggleMobileMenu(); return confirmLogout();" class="block sidebar-link text-red-400 hover:text-red-300 text-base"><i class="fas fa-sign-out-alt w-6 text-center"></i>Logout</a>
+                {% endif %}
+                {% if user.is_staff %}
+                <hr class="border-gray-700/50 my-3">
+                <div class="text-xs text-gray-500 uppercase tracking-wider font-semibold px-3 mb-2">Admin</div>
+                <a href="{% url 'admin_dashboard' %}" class="block sidebar-link text-base" onclick="toggleMobileMenu()"><i class="fas fa-shield-alt w-6 text-center"></i>Admin Panel</a>
+                <a href="{% url 'events:create_event' %}" class="block sidebar-link text-base" onclick="toggleMobileMenu()"><i class="fas fa-plus-circle w-6 text-center"></i>Create Event</a>
+                {% endif %}
+                <hr class="border-gray-700/50 my-3">
+                <div class="text-xs text-gray-500 uppercase tracking-wider font-semibold px-3 mb-2">Help & Info</div>
+                <a href="{% url 'how_it_works' %}" class="block sidebar-link text-sm" onclick="toggleMobileMenu()"><i class="fas fa-lightbulb w-6 text-center"></i>How It Works</a>
+                <a href="{% url 'faq' %}" class="block sidebar-link text-sm" onclick="toggleMobileMenu()"><i class="fas fa-question-circle w-6 text-center"></i>FAQ</a>
+                <a href="https://wa.me/919362603236?text=Hi%20ZoBet%20Support%2C%20I%20need%20help" target="_blank" class="flex items-center gap-3 p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm font-semibold" onclick="toggleMobileMenu()">
+                    <i class="fab fa-whatsapp w-6 text-center"></i>Chat on WhatsApp
+                </a>
+                <a href="{% url 'contact' %}" class="block sidebar-link text-sm" onclick="toggleMobileMenu()"><i class="fas fa-headset w-6 text-center"></i>Contact Support</a>
+                <a href="{% url 'terms' %}" class="block sidebar-link text-sm" onclick="toggleMobileMenu()"><i class="fas fa-file-contract w-6 text-center"></i>Terms of Service</a>
+                <a href="{% url 'privacy' %}" class="block sidebar-link text-sm" onclick="toggleMobileMenu()"><i class="fas fa-shield-alt w-6 text-center"></i>Privacy Policy</a>
+                <a href="{% url 'about' %}" class="block sidebar-link text-sm" onclick="toggleMobileMenu()"><i class="fas fa-info-circle w-6 text-center"></i>About Us</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="pt-14 sm:pt-16">
+        {% if messages %}
+        <div class="fixed top-16 sm:top-20 right-2 sm:right-4 z-50 space-y-2 max-w-[calc(100vw-16px)] sm:max-w-sm">
+            {% for message in messages %}
+            <div class="toast glass border border-gray-700/50 rounded-xl px-4 sm:px-6 py-3 sm:py-4 shadow-2xl flex items-center justify-between gap-3 animate-slide-up" id="msg-{{ forloop.counter }}">
+                <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                    {% if message.tags == 'success' %}<i class="fas fa-check-circle text-green-400 flex-shrink-0"></i>
+                    {% elif message.tags == 'error' %}<i class="fas fa-exclamation-circle text-red-400 flex-shrink-0"></i>
+                    {% elif message.tags == 'warning' %}<i class="fas fa-exclamation-triangle text-yellow-400 flex-shrink-0"></i>
+                    {% else %}<i class="fas fa-info-circle text-blue-400 flex-shrink-0"></i>{% endif %}
+                    <span class="text-xs sm:text-sm text-gray-200 truncate">{{ message }}</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-gray-500 hover:text-white transition flex-shrink-0"><i class="fas fa-times"></i></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="border-t border-gray-800/50 bg-black/50">
+        <div class="max-w-7xl mx-auto px-4 py-8 sm:py-12">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8">
+                <div class="col-span-2 sm:col-span-1">
+                    <div class="flex items-center gap-2 text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                        <span class="text-red-500">&#9733;</span>
+                    <span class="text-white">Zo<span class="text-red-500">Bet</span></span>
+                    </div>
+                    <p class="text-gray-500 text-xs sm:text-sm">Mizoram's ultimate tournament prediction platform.</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-3 sm:mb-4 text-sm">Quick Links</h4>
+                    <ul class="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-500">
+                        <li><a href="{% url 'events:list' %}" class="hover:text-red-400 transition">Events</a></li>
+                        <li><a href="{% url 'leaderboard:index' %}" class="hover:text-red-400 transition">Leaderboard</a></li>
+                        <li><a href="{% url 'community:chat' %}" class="hover:text-red-400 transition">Community</a></li>
+                        <li><a href="{% url 'how_it_works' %}" class="hover:text-red-400 transition">How It Works</a></li>
+                        <li><a href="{% url 'about' %}" class="hover:text-red-400 transition">About Us</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-3 sm:mb-4 text-sm">Support</h4>
+                    <ul class="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-500">
+                        <li><a href="{% url 'faq' %}" class="hover:text-red-400 transition">FAQ</a></li>
+                        <li><a href="{% url 'contact' %}" class="hover:text-red-400 transition">Contact</a></li>
+                        <li><a href="{% url 'terms' %}" class="hover:text-red-400 transition">Terms</a></li>
+                        <li><a href="{% url 'privacy' %}" class="hover:text-red-400 transition">Privacy</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-2 sm:col-span-1">
+                    <h4 class="text-white font-semibold mb-3 sm:mb-4 text-sm">Support</h4>
+                    <div class="space-y-2">
+                        <a href="https://wa.me/919362603236?text=Hi%20ZoBet%20Support%2C%20I%20need%20help" target="_blank" class="flex items-center gap-2 text-green-400 hover:text-green-300 transition text-xs sm:text-sm">
+                            <i class="fab fa-whatsapp text-base"></i> WhatsApp Chat
+                        </a>
+                        <a href="{% url 'contact' %}" class="flex items-center gap-2 text-gray-500 hover:text-red-400 transition text-xs sm:text-sm">
+                            <i class="fas fa-envelope text-base"></i> Contact Form
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800/50 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-gray-600 text-xs sm:text-sm">
+                &copy; 2026 ZoBet. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('menu-icon');
+            menu.classList.toggle('hidden');
+            if (icon) icon.classList.toggle('fa-bars');
+            if (icon) icon.classList.toggle('fa-times');
+        }
+
+        function confirmLogout() {
+            document.getElementById('logout-modal').classList.remove('hidden');
+            return false;
+        }
+        function logoutConfirmed() {
+            window.location.href = '{% url "accounts:logout" %}';
+        }
+        function closeLogoutModal() {
+            document.getElementById('logout-modal').classList.add('hidden');
+        }
+
+        setTimeout(function() {
+            document.querySelectorAll('.toast').forEach(function(el) {
+                el.style.opacity = '0';
+                el.style.transition = 'opacity 0.5s';
+                setTimeout(function() { el.remove(); }, 500);
+            });
+        }, 5000);
+
+        {% if user.is_authenticated %}
+        function updateNotificationCount() {
+            fetch('{% url "notifications:unread_count" %}')
+                .then(r => r.json())
+                .then(d => {
+                    const el = document.getElementById('notif-count');
+                    if (d.count > 0) { el.style.display = 'flex'; el.textContent = d.count; }
+                    else { el.style.display = 'none'; }
+                });
+        }
+        updateNotificationCount();
+        setInterval(updateNotificationCount, 30000);
+        {% endif %}
+    </script>
+    {% block scripts %}{% endblock %}
+
+    <div id="logout-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeLogoutModal()"></div>
+        <div class="relative glass rounded-2xl p-6 sm:p-8 max-w-sm w-full border border-gray-700/50 text-center">
+            <div class="text-4xl mb-4 text-red-400">&#9888;</div>
+            <h3 class="text-lg font-bold text-white mb-2">Leave so soon?</h3>
+            <p class="text-sm text-gray-400 mb-6">Are you sure you want to log out?</p>
+            <div class="flex gap-3">
+                <button onclick="closeLogoutModal()" class="flex-1 px-4 py-2.5 rounded-xl border border-gray-600 text-gray-300 hover:bg-white/5 transition text-sm font-medium">Cancel</button>
+                <button onclick="logoutConfirmed()" class="flex-1 px-4 py-2.5 rounded-xl bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30 transition text-sm font-medium">Logout</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

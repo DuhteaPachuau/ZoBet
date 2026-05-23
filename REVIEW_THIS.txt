@@ -1,0 +1,31 @@
+ZoBet - PROJECT CHECKLIST
+=============================
+
+=== DONE ===
+- Auth: register, login, logout, profile, password reset
+- Google sign-in working (allauth)
+- Events: create, edit, teams, predict, declare winner
+- Wallet: deposit, withdraw with admin approval, transaction history
+- Leaderboard: top earners + accuracy
+- Notifications: per-user, bell icon, unread count
+- Admin dashboard: overview, events, withdrawals, users
+- Pages: home, terms, privacy, contact, how it works, faq, about
+- Responsive UI with Tailwind, glassmorphism theme
+- Wallet fixed: was showing all minus sign (proper transaction types now)
+- Google sign-in fixed: was MultipleObjectsReturned error (removed duplicate APP config)
+- Razorpay removed from template (was causing about:blank popup)
+
+=== TODO ===
+- Deploy to server (domain + hosting)
+- Razorpay integration (if needed)
+- Replace WhatsApp number (919XXXXXXXXX) in base.html + contact.html
+- Update Google OAuth redirect URIs for production domain
+- Change EMAIL_BACKEND to SMTP for real password reset emails
+- Set DEBUG=False, update SECRET_KEY, ALLOWED_HOSTS
+- Auto or manual withdrawal (currently admin must approve)
+- Update Site domain in Django admin (/admin/sites/site/1/)
+
+=== RAZORPAY NOTES ===
+Keys in settings.py: rzp_test_Ssl0RL7toT3MKP / btHBC9XDK93eag8xwY1Q8IGt
+Deposit currently uses direct server-side (no popup).
+Payment views (create_order, webhook, success) are still in code if needed later.

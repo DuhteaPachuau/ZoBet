@@ -1,0 +1,59 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% block title %}Users - ZoBet{% endblock %}
+{% block admin_content %}
+<div class="flex items-center justify-between mb-8">
+    <div>
+        <h1 class="text-3xl font-bold text-white"><i class="fas fa-users text-red-400 mr-2"></i>Users</h1>
+        <p class="text-gray-500 text-sm mt-1">{{ users|length }} registered users</p>
+    </div>
+</div>
+
+<div class="glass rounded-2xl border border-gray-700/50 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-gray-700/50 text-left">
+                    <th class="px-5 py-4 text-gray-400 text-sm font-medium">User</th>
+                    <th class="px-5 py-4 text-gray-400 text-sm font-medium hidden sm:table-cell">Email</th>
+                    <th class="px-5 py-4 text-gray-400 text-sm font-medium hidden md:table-cell">Joined</th>
+                    <th class="px-5 py-4 text-gray-400 text-sm font-medium">Wallet</th>
+                    <th class="px-5 py-4 text-gray-400 text-sm font-medium hidden md:table-cell">Winnings</th>
+                    <th class="px-5 py-4 text-gray-400 text-sm font-medium">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800/30">
+                {% for u in users %}
+                {% with profile=u.profile wallet=u.wallet %}
+                <tr class="hover:bg-white/5 transition">
+                    <td class="px-5 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 text-sm font-bold">{{ u.username|first|upper }}</div>
+                            <div>
+                                <div class="text-white font-medium">{{ u.username }}</div>
+                                <div class="text-gray-600 text-xs">ID: #{{ u.id }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-5 py-4 text-gray-400 text-sm hidden sm:table-cell">{{ u.email|default:"—" }}</td>
+                    <td class="px-5 py-4 text-gray-500 text-sm hidden md:table-cell">{{ u.date_joined|date:"d M Y" }}</td>
+                    <td class="px-5 py-4 text-green-400 font-semibold">₹{{ wallet.balance|floatformat:0 }}</td>
+                    <td class="px-5 py-4 text-yellow-400 font-semibold hidden md:table-cell">₹{{ profile.total_winnings|floatformat:0 }}</td>
+                    <td class="px-5 py-4">
+                        {% if u.is_staff %}
+                        <span class="badge badge-info">Admin</span>
+                        {% elif u.is_active %}
+                        <span class="badge badge-success">Active</span>
+                        {% else %}
+                        <span class="badge badge-danger">Inactive</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endwith %}
+                {% empty %}
+                <tr><td colspan="6" class="text-center py-16 text-gray-500">No users registered yet</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
