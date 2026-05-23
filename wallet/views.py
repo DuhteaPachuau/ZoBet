@@ -39,8 +39,8 @@ def withdraw_view(request):
 
         try:
             amount = float(amount)
-            if amount < 100:
-                messages.error(request, 'Minimum withdrawal amount is ₹100.')
+            if amount <= 0:
+                messages.error(request, 'Invalid withdrawal amount.')
                 return redirect('wallet:withdraw')
             if amount > request.user.wallet.available_balance:
                 messages.error(request, 'Insufficient balance.')

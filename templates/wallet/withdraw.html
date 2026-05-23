@@ -17,7 +17,7 @@
                 {% csrf_token %}
                 <div>
                     <label class="block text-sm text-gray-400 mb-2">Amount (₹)</label>
-                    <input type="number" name="amount" min="100" step="1" placeholder="Min ₹100" max="{{ user.wallet.available_balance }}" required class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition">
+                    <input type="number" name="amount" min="1" step="1" placeholder="Enter amount" max="{{ user.wallet.available_balance }}" required class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition">
                 </div>
                 <div>
                     <label class="block text-sm text-gray-400 mb-2">UPI ID</label>
