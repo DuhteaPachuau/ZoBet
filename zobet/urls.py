@@ -3,8 +3,11 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
+from django.shortcuts import render
 from . import views
 from . import pages_views
+
+handler404 = lambda request, exception: render(request, 'errors/404.html', status=404)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
