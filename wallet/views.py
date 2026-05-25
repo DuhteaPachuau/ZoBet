@@ -15,19 +15,6 @@ def wallet_view(request):
 
 @login_required
 def deposit_view(request):
-    if request.method == 'POST':
-        amount = request.POST.get('amount')
-        try:
-            amount = float(amount)
-            if amount < 1:
-                messages.error(request, 'Minimum deposit is ₹1.')
-                return redirect('wallet:deposit')
-            wallet = request.user.wallet
-            wallet.add_funds(amount, 'Deposit', transaction_type='deposit')
-            messages.success(request, f'₹{amount:.2f} deposited successfully!')
-            return redirect('wallet:wallet')
-        except (ValueError, TypeError):
-            messages.error(request, 'Invalid amount.')
     return render(request, 'wallet/deposit.html')
 
 @login_required
